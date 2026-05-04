@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPWR Compliance Assessment — ISA Digital Consulting</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F2F6F9;min-height:100vh}
+input,select,button{font-family:inherit}
+#app{min-height:100vh}
+
+/* HEADER */ 
+/* in .hdr inserito
+'''
+display: none !important
+'''
+per nascondere l'header */
+.hdr{display:none !important;background:#0B3041;padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.hdr img{height:32px;display:block}
+.tag{background:#005E7C;color:#62BCD0;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:1px}
+
+/* PROGRESS */
+.prog-bar-wrap{background:#0B3041;padding:8px 24px 10px}
+.prog-labels{display:flex;justify-content:space-between;margin-bottom:6px;font-size:11px;color:#8AABBE}
+.prog-track{background:#005E7C;border-radius:20px;height:6px}
+.prog-fill{height:6px;border-radius:20px;transition:width .4s;background:linear-gradient(90deg,#62BCD0,#0F9ED5)}
+
+/* CARD */
+.card{background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(11,48,65,.10);overflow:hidden}
+.container{max-width:760px;margin:0 auto;padding:28px 20px}
+.container-sm{max-width:620px;margin:0 auto;padding:40px 20px}
+.container-md{max-width:720px;margin:0 auto;padding:40px 20px}
+.container-lg{max-width:780px;margin:0 auto;padding:28px 20px}
+
+/* SECTION HEADER */
+.sec-hdr{padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.sec-hdr-left{display:flex;align-items:center;gap:10px}
+.sec-hdr-icon{font-size:24px}
+.sec-hdr-title{color:#fff;font-weight:800;font-size:16px}
+.sec-hdr-ref{color:rgba(255,255,255,.7);font-size:11px;margin-top:2px}
+.sec-hdr-right{color:rgba(255,255,255,.8);font-size:12px}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid #E8EEF3;overflow-x:auto}
+.tab-btn{flex:1;min-width:60px;padding:8px 4px;border:none;cursor:pointer;font-size:11px;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tab-dot{width:6px;height:6px;border-radius:50%;background:#4EA72E;display:none}
+.tab-dot.show{display:block}
+
+/* QUESTION CARD */
+.q-card{background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(11,48,65,.10);margin-bottom:16px;padding:24px}
+.q-header{display:flex;gap:12px;margin-bottom:12px}
+.q-num{min-width:28px;height:28px;border-radius:50%;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.q-text{flex:1}
+.q-title{margin:0 0 4px;color:#0B3041;font-weight:600;font-size:14px;line-height:1.5}
+.q-ref{font-size:11px;color:#8A9BB0;font-weight:500}
+.badge-critico{background:rgba(234,0,72,.12);color:#EA0048;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-right:6px}
+.options{display:flex;flex-direction:column;gap:8px}
+.opt-label{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;transition:all .15s;border:1.5px solid #E0E8EE;background:#F8FAFB}
+.opt-label:hover{border-color:#007FA3;background:#f0f8fc}
+.opt-radio{display:none}
+.opt-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;border:2px solid #C0CDD8;background:transparent;display:flex;align-items:center;justify-content:center}
+.opt-dot-inner{width:6px;height:6px;border-radius:50%;background:#fff;display:none}
+.opt-text{font-size:13px;color:#464D62;flex:1}
+.opt-score{margin-left:auto;font-size:11px;font-weight:700;color:#C0CDD8}
+
+/* BUTTONS */
+.btn{border:none;border-radius:8px;padding:11px 28px;font-weight:700;font-size:14px;cursor:pointer;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn:disabled{cursor:not-allowed;opacity:.6}
+.btn-nav{display:flex;gap:12px;margin-top:8px;align-items:center}
+
+/* FORM */
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:600;color:#464D62;display:block;margin-bottom:4px}
+.form-input{width:100%;border:1.5px solid #D1DCE5;border-radius:8px;padding:10px 14px;font-size:14px;outline:none}
+.form-input:focus{border-color:#007FA3}
+.form-input.err{border-color:#EA0048}
+.form-error{color:#EA0048;font-size:11px;display:block;margin-top:3px}
+
+/* WELCOME */
+.welcome-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+.stat-box{background:#F2F6F9;border-radius:10px;padding:16px 10px;text-align:center}
+.stat-n{font-size:26px;font-weight:800;color:#007FA3}
+.stat-l{font-size:12px;color:#464D62;margin-top:4px}
+.sections-list{background:#F8FAFB;border-radius:10px;padding:16px 20px;margin-bottom:28px;text-align:left}
+.sections-list p{margin:0 0 8px;font-size:13px;color:#464D62;font-weight:600}
+.sec-pill-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.sec-pill{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600}
+.sec-ref{font-size:11px;color:#8A9BB0}
+
+/* RESULTS */
+.hero-score{padding:36px 32px;display:flex;align-items:center;gap:32px}
+.hero-pct{text-align:center;min-width:100px}
+.hero-pct-num{font-size:52px;font-weight:900;color:#fff;line-height:1}
+.hero-pct-sub{color:#62BCD0;font-size:11px;margin-top:4px}
+.hero-info{flex:1}
+.hero-company{font-size:18px;font-weight:800;color:#fff;margin-bottom:6px}
+.risk-badge{display:inline-block;color:#fff;font-weight:700;font-size:13px;padding:4px 16px;border-radius:20px;margin-bottom:10px}
+.hero-desc{color:rgba(255,255,255,.7);font-size:13px;line-height:1.5}
+.gaps-alert{border-top:2px solid rgba(234,0,72,.3);padding:12px 24px;display:flex;align-items:center;gap:10px;background:rgba(234,0,72,.06)}
+.gaps-alert-icon{color:#EA0048;font-size:18px}
+.gaps-alert-text{color:#EA0048;font-size:13px;font-weight:600}
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.sec-result-card{background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(11,48,65,.10);padding:18px}
+.sec-result-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sec-result-icon{font-size:20px}
+.sec-result-name{font-size:12px;font-weight:700;color:#0B3041}
+.sec-result-ref{font-size:10px;color:#8A9BB0}
+.sec-result-pct{font-size:18px;font-weight:800;margin-left:auto}
+.bar-track{background:#E8EEF3;border-radius:20px;height:6px}
+.bar-fill{height:6px;border-radius:20px;transition:width .6s}
+.sec-result-bottom{display:flex;justify-content:space-between;margin-top:6px;font-size:11px}
+.gaps-card{background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(11,48,65,.10);margin-bottom:20px;padding:24px}
+.gaps-title{color:#EA0048;margin:0 0 16px;font-size:15px;font-weight:800}
+.gap-item{display:flex;gap:12px;margin-bottom:12px;padding:12px 14px;background:rgba(234,0,72,.05);border-radius:8px;border:1px solid rgba(234,0,72,.15)}
+.gap-num{color:#EA0048;font-weight:800;font-size:14px;min-width:22px}
+.gap-section-badge{display:inline-block;background:rgba(234,0,72,.12);color:#EA0048;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-bottom:4px}
+.gap-text{margin:0;font-size:12.5px;color:#0B3041;line-height:1.5}
+.deadlines-card{background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(11,48,65,.10);margin-bottom:20px;padding:24px}
+.deadlines-title{color:#0B3041;margin:0 0 16px;font-size:15px;font-weight:800}
+.deadlines-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.deadline-item{display:flex;gap:10px;padding:10px 14px;border-radius:8px}
+.deadline-date{color:#fff;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;min-width:80px;text-align:center;flex-shrink:0;line-height:1.6}
+.deadline-text{font-size:12px;color:#0B3041;font-weight:500;line-height:1.4}
+.cta-card{border-radius:12px;box-shadow:0 2px 16px rgba(11,48,65,.10);padding:28px;text-align:center;margin-bottom:20px}
+.cta-title{font-size:16px;font-weight:800;color:#fff;margin-bottom:8px}
+.cta-desc{color:rgba(255,255,255,.75);font-size:13px;margin:0 0 20px}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.privacy-note{text-align:center;margin-top:16px;font-size:11px;color:#9AAAB8}
+
+@media(max-width:600px){
+  .form-grid-2{grid-template-columns:1fr}
+  .sec-grid{grid-template-columns:1fr}
+  .deadlines-grid{grid-template-columns:1fr}
+  .hero-score{flex-direction:column;text-align:center}
+  .welcome-stats{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+const LOGO = "data:image/png;base64,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";
+
+const C = {
+  teal1:"#62BCD0",teal2:"#3298B0",teal3:"#007FA3",
+  teal4:"#005E7C",navy:"#0B3041",cyan2:"#0F9ED5",
+  slate:"#464D62",red:"#EA0048",green:"#4EA72E",amber:"#F59E0B"
+};
+
+const EJS_SERVICE  = "service_g3ffieb";
+const EJS_TEMPLATE = "template_d8fzy5f";
+const EJS_KEY      = "LH3fMBIuQxggKMZl0";
+
+const SECTIONS = [
+  {
+    id:"primario", title:"Packaging Primario", icon:"☕", ref:"Artt. 5–11 PPWR", color:C.teal3,
+    questions:[
+      {id:"p1",risk:true,text:"Il packaging primario (capsule, sacchetti, cialde) è composto da materiali riciclabili o compostabili certificati?",ref:"PPWR Art. 6",options:[{l:"Sì, certificato e documentato",s:3},{l:"Parzialmente — alcuni formati sì, altri no",s:1},{l:"No / non verificato",s:0}]},
+      {id:"p2",risk:true,text:"Se l'azienda utilizza imballaggi compostabili, dispone di certificazione EN 13432 o equivalente rilasciata da organismo accreditato?",ref:"PPWR Annex II",options:[{l:"Sì, certificazione valida e aggiornata",s:3},{l:"In corso di certificazione",s:1},{l:"No / non applicabile",s:0}]},
+      {id:"p2b",risk:false,text:"Gli imballaggi compostabili utilizzati rientrano nelle categorie esplicitamente ammesse dal PPWR come eccezione alla riciclabilità (es. filtri, capsule permeabili, etichette per ortofrutta)?",ref:"PPWR Art. 9 par. 1",options:[{l:"Sì, le nostre tipologie rientrano nelle categorie ammesse con documentazione",s:3},{l:"Riteniamo di rientrare ma non abbiamo verifica formale",s:1},{l:"Non abbiamo ancora verificato / non applicabile",s:0}]},
+      {id:"p3",risk:false,text:"Il packaging primario in plastica contiene la percentuale minima di contenuto riciclato (PCR) prevista dal PPWR?",ref:"PPWR Art. 7 — target 30% entro 2030",options:[{l:"Sì, già implementato con documentazione",s:3},{l:"In fase di transizione / roadmap definita",s:1},{l:"No",s:0}]},
+      {id:"p3b",risk:false,text:"Il packaging primario è progettato secondo criteri di Design for Recycling verificati rispetto alle linee guida riconosciute (es. Ceflex per il flessibile, RecyClass per rigido/multimateriale)?",ref:"PPWR Art. 6",options:[{l:"Sì, verifica effettuata e documentata secondo linee guida riconosciute",s:3},{l:"In fase di verifica / valutazione in corso",s:1},{l:"No / non abbiamo ancora affrontato il tema",s:0}]},
+      {id:"p4",risk:false,text:"Il packaging primario è stato ottimizzato per ridurre peso e volume al minimo necessario?",ref:"PPWR Art. 10 — entro 1° gennaio 2030",options:[{l:"Sì, analisi documentata e ottimizzazione attuata",s:3},{l:"Valutazione in corso",s:1},{l:"No",s:0}]},
+      {id:"p5",risk:true,text:"Il packaging primario è privo di sostanze chimiche preoccupanti (PFAS, BPA, metalli pesanti)?",ref:"PPWR Art. 5 + REACH — soglie PFAS dal 12/08/2026",options:[{l:"Sì, analisi chimica disponibile e documentata",s:3},{l:"Non completamente verificato",s:1},{l:"No / non verificato",s:0}]},
+      {id:"p6",risk:true,text:"Le comunicazioni ambientali sul packaging sono supportate da evidenze verificabili?",ref:"PPWR Art. 11 + Green Claims Directive",options:[{l:"Sì, tutte le asserzioni sono documentate e verificabili",s:3},{l:"Alcune affermazioni presenti ma non formalmente comprovate",s:1},{l:"Non utilizziamo green claims / non abbiamo verificato la conformità",s:0}]},
+      {id:"p7",risk:false,text:"Se l'azienda commercializza imballaggi 'riutilizzabili', questi rispettano i requisiti tecnici minimi previsti dal PPWR?",ref:"PPWR Art. 11",options:[{l:"Sì, requisiti tecnici verificati e documentati",s:3},{l:"Linea riutilizzabile presente ma requisiti non ancora verificati formalmente",s:1},{l:"Non applicabile / nessun imballaggio venduto come riutilizzabile",s:0}]}
+    ]
+  },
+  {
+    id:"secondario", title:"Packaging Secondario e Terziario", icon:"📦", ref:"Artt. 24–29 PPWR", color:C.teal4,
+    questions:[
+      {id:"s1",risk:true,text:"Il packaging secondario (box, astucci) è realizzato con materiale riciclato e riciclabile?",ref:"PPWR Art. 6–7",options:[{l:"Sì, certificato FSC/PEFC e contenuto riciclato documentato",s:3},{l:"Parzialmente — solo una condizione soddisfatta",s:1},{l:"No",s:0}]},
+      {id:"s2",risk:false,text:"Il packaging terziario (film stretch, pallet) rispetta i requisiti di riciclabilità PPWR?",ref:"PPWR — film PE monostrato riciclabile",options:[{l:"Sì, già in linea o transizione pianificata",s:3},{l:"Analisi non ancora eseguita",s:1},{l:"No / utilizziamo materiali non conformi",s:0}]},
+      {id:"s3",risk:true,text:"Lo spazio vuoto negli imballaggi multipli, da trasporto e per e-commerce è minimizzato (max 50%)?",ref:"PPWR Art. 24 — entro 1° gennaio 2030",options:[{l:"Sì, verificato e documentato per tutti i canali",s:3},{l:"Sospettiamo criticità ma non abbiamo misurato",s:1},{l:"Non rispettato",s:0}]},
+      {id:"s4",risk:false,text:"Esistono programmi di riutilizzo o restituzione per il packaging secondario/terziario?",ref:"PPWR Art. 29 par. 1 — 40% trasporto dal 2030",options:[{l:"Sì, sistema strutturato e operativo",s:3},{l:"In valutazione",s:1},{l:"No",s:0}]},
+      {id:"s5",risk:true,text:"I formati di packaging in uso sono stati verificati rispetto ai divieti specifici previsti dal PPWR (Allegato V)?",ref:"PPWR Art. 25 + Allegato V — divieti dal 01/01/2030",options:[{l:"Sì, analisi completata (nessun formato vietato o piano di sostituzione definito)",s:3},{l:"Analisi parziale / incertezza su alcuni formati",s:1},{l:"Non abbiamo ancora verificato",s:0}]},
+      {id:"s6",risk:false,text:"L'azienda ha verificato la riciclabilità degli imballaggi multimateriale (es. vaschette con film, tetrapak, sacchetti con chiusura zip) rispetto alle classi A, B, C previste dal PPWR?",ref:"PPWR Art. 6",options:[{l:"Sì, verifica completata con classificazione documentata per tutti i formati",s:3},{l:"Analisi parziale / in corso per alcuni formati",s:1},{l:"Non abbiamo ancora affrontato la classificazione per classi",s:0}]},
+      {id:"s7",risk:false,text:"Sono stati mappati gli imballaggi potenzialmente soggetti ai divieti dell'Allegato V anche nei canali di vendita indiretti (GDO, e-commerce, ingrosso)?",ref:"PPWR Art. 25 + Allegato V",options:[{l:"Sì, mappatura completa su tutti i canali con piano di sostituzione ove necessario",s:3},{l:"Mappatura parziale / analisi avviata solo per i canali principali",s:1},{l:"Non abbiamo ancora esteso la verifica ai canali indiretti",s:0}]}
+    ]
+  },
+  {
+    id:"filiera", title:"Filiera e Fornitori", icon:"🔗", ref:"Artt. 13–22 PPWR", color:C.teal2,
+    questions:[
+      {id:"f0",risk:true,text:"L'azienda ha identificato formalmente il proprio ruolo come operatore economico ai sensi del PPWR (fabbricante, importatore, distributore)?",ref:"PPWR Art. 13–22",options:[{l:"Sì, ruolo identificato con analisi legale e obblighi mappati",s:3},{l:"Ruolo presunto ma non formalizzato",s:1},{l:"Non ancora analizzato",s:0}]},
+      {id:"f1",risk:false,text:"I fornitori di materiali da imballaggio sono stati informati dei requisiti PPWR con impegno contrattuale?",ref:"PPWR + CSDDD — clausole contrattuali ESG",options:[{l:"Sì, clausole contrattuali PPWR già in essere",s:3},{l:"Comunicazione avviata ma nessun obbligo formale",s:1},{l:"No",s:0}]},
+      {id:"f2",risk:true,text:"Vengono raccolte le dichiarazioni di conformità (DoC) e schede tecniche dei materiali dai fornitori?",ref:"PPWR Art. 10–11",options:[{l:"Sì, archivio aggiornato e strutturato",s:3},{l:"Parzialmente — alcune categorie sì, altre no",s:1},{l:"No",s:0}]},
+      {id:"f3",risk:false,text:"I fornitori sono soggetti ad audit periodici sulla sostenibilità dei materiali?",ref:"Best practice PPWR + CSRD",options:[{l:"Sì, audit periodici o questionari strutturati",s:3},{l:"Solo per fornitori critici/principali",s:1},{l:"No",s:0}]},
+      {id:"f4",risk:false,text:"Esiste una mappatura aggiornata di tutti i materiali da imballaggio utilizzati?",ref:"PPWR Art. 10",options:[{l:"Sì, database completo e aggiornato",s:3},{l:"Mappatura parziale o non strutturata",s:1},{l:"No",s:0}]}
+    ]
+  },
+  {
+    id:"processi", title:"Processi e Documentazione", icon:"📋", ref:"Artt. 12, 39, 44, 45 PPWR", color:C.slate,
+    questions:[
+      {id:"d1",risk:true,text:"Il packaging riporta le etichette obbligatorie PPWR (simbolo riciclabilità, materiale, istruzioni smaltimento)?",ref:"PPWR Art. 12 — obbligatoria entro 12/08/2028",options:[{l:"Sì, già conforme o roadmap entro scadenze PPWR",s:3},{l:"Etichettatura parziale o non aggiornata",s:1},{l:"No",s:0}]},
+      {id:"d2",risk:true,text:"L'azienda è iscritta a un sistema EPR nei Paesi di commercializzazione (in Italia: CONAI/Consorzi)?",ref:"PPWR Art. 45 + Art. 44",options:[{l:"Sì, iscrizione e contributi aggiornati in tutti i mercati",s:3},{l:"Solo in alcuni Paesi / in corso di regolarizzazione",s:1},{l:"No",s:0}]},
+      {id:"d2b",risk:false,text:"I contributi EPR tengono conto della classe di riciclabilità e del contenuto riciclato degli imballaggi (eco-modulazione)?",ref:"PPWR Art. 45",options:[{l:"Sì, contributi calcolati con eco-modulazione e classe di riciclabilità nota",s:3},{l:"Iscritti a EPR ma eco-modulazione non ancora applicata / non conosciuta",s:1},{l:"No / non a conoscenza di questo meccanismo",s:0}]},
+      {id:"d3",risk:false,text:"Esiste un processo interno per il monitoraggio delle scadenze normative PPWR (governance 2025–2030)?",ref:"PPWR — scadenze progressive 2025–2030",options:[{l:"Sì, governance strutturata con responsabile dedicato",s:3},{l:"Monitoraggio informale / ad hoc",s:1},{l:"No",s:0}]},
+      {id:"d4",risk:false,text:"È stata pianificata l'implementazione della marcatura digitale standardizzata sull'imballaggio (QR code o equivalente)?",ref:"PPWR Art. 12 par. 7 — entro 1° gennaio 2030",options:[{l:"Sì, roadmap di implementazione marcatura digitale definita",s:3},{l:"Consapevolezza del requisito, nessuna azione ancora",s:1},{l:"Non ne siamo a conoscenza",s:0}]},
+      {id:"d5",risk:false,text:"L'azienda produce reporting sulla sostenibilità del packaging (quantità, materiali, % riciclato)?",ref:"PPWR Art. 44 + CSRD ESRS E5",options:[{l:"Sì, reporting strutturato e dati verificabili",s:3},{l:"Raccolta dati in corso, reporting non formalizzato",s:1},{l:"No",s:0}]},
+      {id:"d6",risk:true,text:"L'azienda ha redatto la propria Dichiarazione di Conformità UE e la Documentazione Tecnica (Allegato VII PPWR)?",ref:"PPWR Art. 39 + Art. 15 par. 2–3",options:[{l:"Sì, DoC propria redatta e documentazione tecnica strutturata",s:3},{l:"Consapevolezza dell'obbligo, iter avviato ma non completato",s:1},{l:"No / non sapevamo fosse un obbligo distinto da quello dei fornitori",s:0}]},
+      {id:"d7",risk:true,text:"Sugli imballaggi è riportato in modo duraturo il nome, il marchio e l'indirizzo del fabbricante o importatore responsabile dell'immissione sul mercato UE?",ref:"PPWR Art. 15 par. 5–6",options:[{l:"Sì, marcatura presente su tutti i formati e sistema di tracciabilità attivo",s:3},{l:"Presente su alcuni formati / sistema di tracciabilità parziale",s:1},{l:"No",s:0}]}
+    ]
+  }
+];
+
+const MAX_SCORE = SECTIONS.reduce((t,s)=>t+s.questions.length*3,0); // 87
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function secScore(sid, ans){
+  const s=SECTIONS.find(x=>x.id===sid);
+  if(!s)return{score:0,max:0,pct:0};
+  const max=s.questions.length*3;
+  const score=s.questions.reduce((t,q)=>t+(ans[q.id]??0),0);
+  return{score,max,pct:Math.round(score/max*100)};
+}
+function globalScore(ans){
+  const score=Object.values(ans).reduce((t,v)=>t+v,0);
+  return{score,pct:Math.round(score/MAX_SCORE*100)};
+}
+function riskLevel(pct){
+  if(pct>=75)return{label:"Basso Rischio",color:C.green};
+  if(pct>=45)return{label:"Rischio Moderato",color:C.amber};
+  return{label:"Rischio Elevato",color:C.red};
+}
+function criticalGaps(ans){
+  return SECTIONS.flatMap(s=>
+    s.questions.filter(q=>q.risk&&(ans[q.id]??0)===0)
+    .map(q=>({section:s.title,text:q.text,ref:q.ref}))
+  );
+}
+
+// ── App State ───────────────────────────────────────────────────────────────
+const state = {
+  step:"welcome",
+  secIdx:0,
+  form:{name:"",company:"",role:"",email:"",phone:""},
+  answers:{},
+  emailSent:false,
+  jsPdfReady:!!window.jspdf
+};
+
+function setState(patch){
+  Object.assign(state,patch);
+  render();
+}
+
+// ── EmailJS ──────────────────────────────────────────────────────────────────
+async function sendLead(){
+  const g=globalScore(state.answers);
+  const risk=riskLevel(g.pct);
+  const gaps=criticalGaps(state.answers);
+  const secSum=SECTIONS.map(s=>{const r=secScore(s.id,state.answers);return `${s.title}: ${r.score}/${r.max} (${r.pct}%) — ${riskLevel(r.pct).label}`;}).join("\n");
+  const gapsText=gaps.length?gaps.map((g,i)=>`${i+1}. [${g.section}] ${g.text} (${g.ref})`).join("\n"):"Nessun gap critico.";
+  const f=state.form;
+  const msg=`PPWR ASSESSMENT — ISA Digital Consulting\nReg. (UE) 2025/40\n\nLEAD\nNome: ${f.name}\nAzienda: ${f.company}\nRuolo: ${f.role}\nEmail: ${f.email}\nTelefono: ${f.phone}\nData: ${new Date().toLocaleDateString("it-IT")}\n\nRISULTATI GLOBALI\nPunteggio: ${g.score}/${MAX_SCORE} (${g.pct}%)\nLivello: ${risk.label}\n\nSEZIONI\n${secSum}\n\nGAP CRITICI\n${gapsText}`;
+  try{
+    await fetch("https://api.emailjs.com/api/v1.0/email/send",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({service_id:EJS_SERVICE,template_id:EJS_TEMPLATE,user_id:EJS_KEY,
+        template_params:{to_name:"ISA Digital Consulting",from_name:`${f.name} — ${f.company}`,reply_to:f.email,message:msg}})
+    });
+  }catch(e){}
+}
+
+// ── PDF ──────────────────────────────────────────────────────────────────────
+function generatePDF(){
+  if(!window.jspdf)return;
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:"mm",format:"a4"});
+  const W=210, today=new Date().toLocaleDateString("it-IT");
+  const g=globalScore(state.answers);
+  const gR=riskLevel(g.pct);
+  const gaps=criticalGaps(state.answers);
+  const f=state.form;
+
+  // Cover
+  doc.setFillColor(11,48,65);doc.rect(0,0,W,297,"F");
+  doc.setFillColor(0,127,163);doc.rect(0,0,W,8,"F");doc.rect(0,289,W,8,"F");
+  doc.addImage(LOGO,"PNG",W/2-40,14,80,26);
+  doc.setTextColor(255,255,255);doc.setFontSize(26);doc.setFont("helvetica","bold");
+  doc.text("PPWR COMPLIANCE",W/2,58,{align:"center"});
+  doc.setFontSize(20);doc.text("ASSESSMENT REPORT",W/2,70,{align:"center"});
+  doc.setFillColor(0,127,163);doc.roundedRect(30,78,W-60,.8,.4,.4,"F");
+  doc.setFontSize(11);doc.setTextColor(180,220,235);doc.setFont("helvetica","normal");
+  doc.text("Reg. (UE) 2025/40 — Packaging and Packaging Waste Regulation",W/2,90,{align:"center"});
+  doc.setFillColor(0,94,124);doc.roundedRect(55,105,100,55,5,5,"F");
+  doc.setTextColor(98,188,208);doc.setFontSize(10);doc.text("PUNTEGGIO GLOBALE",W/2,118,{align:"center"});
+  doc.setTextColor(255,255,255);doc.setFontSize(38);doc.setFont("helvetica","bold");
+  doc.text(`${g.pct}%`,W/2,140,{align:"center"});
+  doc.setFontSize(12);doc.setTextColor(180,220,235);doc.setFont("helvetica","normal");
+  doc.text(`${g.score} / ${MAX_SCORE} punti`,W/2,150,{align:"center"});
+  const rc=gR.color===C.green?[78,167,46]:gR.color===C.amber?[245,158,11]:[234,0,72];
+  doc.setFillColor(...rc);doc.roundedRect(70,158,70,10,3,3,"F");
+  doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont("helvetica","bold");
+  doc.text(gR.label.toUpperCase(),W/2,165,{align:"center"});
+  doc.setTextColor(180,220,235);doc.setFontSize(10);doc.setFont("helvetica","normal");
+  doc.text(`Azienda: ${f.company}`,W/2,185,{align:"center"});
+  doc.text(`Referente: ${f.name} — ${f.role}`,W/2,193,{align:"center"});
+  doc.text(`Data: ${today}`,W/2,201,{align:"center"});
+  doc.setFontSize(8);doc.setTextColor(98,188,208);
+  doc.text("Documento riservato — uso interno ISA Digital Consulting",W/2,288,{align:"center"});
+
+  // Page 2 - sections
+  doc.addPage();
+  doc.setFillColor(245,248,250);doc.rect(0,0,W,297,"F");
+  doc.setFillColor(0,127,163);doc.rect(0,0,W,18,"F");
+  doc.setTextColor(255,255,255);doc.setFontSize(13);doc.setFont("helvetica","bold");
+  doc.text("RISULTATI PER SEZIONE",15,12);
+  doc.setFontSize(9);doc.setFont("helvetica","normal");
+  doc.text(`${f.company} | ${today}`,W-15,12,{align:"right"});
+  let y=30;
+  ["A.","B.","C.","D."].forEach((lbl,si)=>{
+    const s=SECTIONS[si];const r=secScore(s.id,state.answers);const rl=riskLevel(r.pct);
+    const bar=Math.round(r.pct/100*140);
+    doc.setFillColor(255,255,255);doc.roundedRect(12,y,W-24,28,3,3,"F");
+    doc.setDrawColor(220,230,235);doc.roundedRect(12,y,W-24,28,3,3,"S");
+    doc.setTextColor(11,48,65);doc.setFontSize(10);doc.setFont("helvetica","bold");
+    doc.text(`${lbl}  ${s.title}`,18,y+8);
+    doc.setFontSize(8);doc.setFont("helvetica","normal");doc.setTextColor(100,120,140);
+    doc.text(s.ref,18,y+14);
+    doc.setFillColor(220,230,235);doc.roundedRect(18,y+18,140,4,2,2,"F");
+    const rc2=rl.color===C.green?[78,167,46]:rl.color===C.amber?[245,158,11]:[234,0,72];
+    doc.setFillColor(...rc2);doc.roundedRect(18,y+18,bar,4,2,2,"F");
+    doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(...rc2);
+    doc.text(`${r.pct}%`,162,y+22);
+    doc.setFontSize(8);doc.setTextColor(100,120,140);
+    doc.text(`${r.score}/${r.max} pt`,W-20,y+22,{align:"right"});
+    y+=34;
+  });
+
+  // Page 3 - gaps
+  doc.addPage();
+  doc.setFillColor(245,248,250);doc.rect(0,0,W,297,"F");
+  doc.setFillColor(234,0,72);doc.rect(0,0,W,18,"F");
+  doc.setTextColor(255,255,255);doc.setFontSize(13);doc.setFont("helvetica","bold");
+  doc.text(`GAP CRITICI — ${gaps.length} elementi da presidiare`,15,12);
+  doc.setFontSize(9);doc.setFont("helvetica","normal");
+  doc.text(`${f.company} | ${today}`,W-15,12,{align:"right"});
+  y=28;
+  if(!gaps.length){
+    doc.setTextColor(78,167,46);doc.setFontSize(12);doc.setFont("helvetica","bold");
+    doc.text("Nessun gap critico rilevato.",W/2,80,{align:"center"});
+  } else {
+    gaps.forEach((gap,i)=>{
+      if(y>260){doc.addPage();y=20;}
+      doc.setFillColor(255,245,247);doc.setDrawColor(234,0,72);
+      doc.roundedRect(12,y,W-24,22,2,2,"FD");
+      doc.setTextColor(234,0,72);doc.setFontSize(7.5);doc.setFont("helvetica","bold");
+      doc.text(`${i+1}. [${gap.section}]  ${gap.ref}`,17,y+7);
+      doc.setTextColor(50,60,75);doc.setFont("helvetica","normal");doc.setFontSize(7.5);
+      const lines=doc.splitTextToSize(gap.text,W-36);
+      doc.text(lines[0],17,y+14);if(lines[1])doc.text(lines[1],17,y+19);
+      y+=27;
+    });
+  }
+
+  // Page 4 - roadmap
+  doc.addPage();
+  doc.setFillColor(245,248,250);doc.rect(0,0,W,297,"F");
+  doc.setFillColor(0,94,124);doc.rect(0,0,W,18,"F");
+  doc.setTextColor(255,255,255);doc.setFontSize(13);doc.setFont("helvetica","bold");
+  doc.text("ROADMAP E SCADENZE PPWR",15,12);
+  const roadmap=[
+    {date:"22 gen 2025",label:"Entrata in vigore Reg. (UE) 2025/40",color:[98,188,208]},
+    {date:"12 ago 2026",label:"Limitazione PFAS — imballaggi a contatto con alimenti (Art. 5)",color:[234,0,72]},
+    {date:"12 feb 2027",label:"Obbligo ricarica HoReCa — contenitori per cibo e bevande (Art. 28)",color:[0,127,163]},
+    {date:"12 feb 2028",label:"Compostabilità per alcune tipologie di imballaggi (Art. 9)",color:[70,77,98]},
+    {date:"12 feb 2028",label:"Riduzione peso/volume imballaggi per la vendita (Art. 10)",color:[70,77,98]},
+    {date:"12 feb 2028",label:"Riutilizzo obbligatorio per il settore HoReCa (Art. 29)",color:[0,127,163]},
+    {date:"12 ago 2028",label:">> Etichettatura armonizzata obbligatoria con dettagli sul materiale (Art. 12)",color:[234,0,72]},
+    {date:"1 gen 2030",label:">> Restrizioni imballaggi plastica monouso specifici (Allegato V)",color:[234,0,72]},
+    {date:"1 gen 2030",label:">> Contenuto riciclato minimo plastica (Art. 7) + Riduzione spazio vuoto (Art. 24)",color:[234,0,72]},
+    {date:"1 gen 2030",label:">> Riciclabilità per classi A, B o C + % minime riutilizzo (Art. 6, 29)",color:[234,0,72]},
+  ];
+  y=28;
+  roadmap.forEach(item=>{
+    doc.setFillColor(...item.color);doc.roundedRect(12,y,40,10,2,2,"F");
+    doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont("helvetica","bold");
+    doc.text(item.date,32,y+6.5,{align:"center"});
+    doc.setTextColor(30,40,55);doc.setFont("helvetica","normal");doc.setFontSize(8.5);
+    doc.text(item.label,58,y+6.5);
+    y+=15;
+  });
+  doc.setFillColor(11,48,65);doc.rect(0,280,W,17,"F");
+  doc.setTextColor(98,188,208);doc.setFontSize(8);doc.setFont("helvetica","bold");
+  doc.text("ISA Digital Consulting  |  ESG Business Unit",W/2,288,{align:"center"});
+  doc.setFont("helvetica","normal");doc.setTextColor(150,190,210);
+  doc.text("Documento generato in conformità al Reg. (UE) 2025/40 — Packaging and Packaging Waste Regulation",W/2,294,{align:"center"});
+
+  doc.save(`PPWR_Assessment_${f.company.replace(/\s+/g,"_")}_${today.replace(/\//g,"-")}.pdf`);
+}
+
+// ── Render helpers ───────────────────────────────────────────────────────────
+function h(tag,attrs,...children){
+  const el=document.createElement(tag);
+  if(attrs)Object.entries(attrs).forEach(([k,v])=>{
+    if(k==="style"&&typeof v==="object")Object.assign(el.style,v);
+    else if(k.startsWith("on"))el.addEventListener(k.slice(2).toLowerCase(),v);
+    else if(k==="className")el.className=v;
+    else if(k==="disabled")el.disabled=!!v;
+    else el.setAttribute(k,v);
+  });
+  children.flat(Infinity).forEach(c=>{
+    if(c==null||c===false)return;
+    el.appendChild(typeof c==="string"?document.createTextNode(c):c);
+  });
+  return el;
+}
+function $div(cls,style,...ch){return h("div",{className:cls,style},...ch);}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function render(){
+  const app=document.getElementById("app");
+  app.innerHTML="";
+
+  if(state.step==="welcome") app.appendChild(renderWelcome());
+  else if(state.step==="form") app.appendChild(renderForm());
+  else if(state.step==="assessment") app.appendChild(renderAssessment());
+  else if(state.step==="results") app.appendChild(renderResults());
+}
+
+// ── WELCOME ──────────────────────────────────────────────────────────────────
+function renderWelcome(){
+  const wrap=h("div",{className:"",style:{fontFamily:"inherit",background:"#F2F6F9",minHeight:"100vh"}});
+  wrap.appendChild(renderHeader("ESG BUSINESS UNIT"));
+
+  const cont=$div("container-md");
+  const card=$div("card",{padding:"40px",textAlign:"center"});
+
+  card.appendChild(h("div",{style:{fontSize:"40px",marginBottom:"12px"}},"📦"));
+  card.appendChild(h("h1",{style:{color:C.navy,fontSize:"28px",fontWeight:"800",margin:"0 0 8px"}},"PPWR Compliance Assessment"));
+  card.appendChild(h("p",{style:{color:C.teal3,fontWeight:"600",fontSize:"14px",margin:"0 0 20px"}},"Regolamento (UE) 2025/40 — Packaging and Packaging Waste Regulation"));
+  card.appendChild(h("p",{style:{color:C.slate,lineHeight:"1.7",maxWidth:"580px",margin:"0 auto 28px",fontSize:"14px"}},"Valuta il livello di conformità degli imballaggi della tua azienda al PPWR, il regolamento europeo che ridefinisce i requisiti di sostenibilità, riciclabilità, etichettatura e responsabilità estesa del produttore."));
+
+  const stats=$div("welcome-stats");
+  [{n:"4",l:"Sezioni tematiche"},{n:"29",l:"Domande di assessment"},{n:"~10'",l:"Tempo stimato"}].forEach(({n,l})=>{
+    const b=$div("stat-box");
+    b.appendChild($div("stat-n",null,n));
+    b.appendChild($div("stat-l",null,l));
+    stats.appendChild(b);
+  });
+  card.appendChild(stats);
+
+  const sl=$div("sections-list");
+  sl.appendChild(h("p",null,"📋 Il tool copre:"));
+  SECTIONS.forEach(s=>{
+    const row=$div("sec-pill-row");
+    const pill=h("span",{className:"sec-pill",style:{background:s.color+"18",border:`1.5px solid ${s.color}40`,color:s.color}},s.icon+" "+s.title);
+    row.appendChild(pill);
+    row.appendChild(h("span",{className:"sec-ref"},s.ref));
+    sl.appendChild(row);
+  });
+  card.appendChild(sl);
+
+  const btn=h("button",{className:"btn",style:{background:C.teal3,color:"#fff"}},"Inizia l'Assessment →");
+  btn.addEventListener("click",()=>setState({step:"form"}));
+  card.appendChild(btn);
+  cont.appendChild(card);
+  cont.appendChild(h("p",{className:"privacy-note"},"I tuoi dati sono trattati esclusivamente per finalità di assessment da ISA Digital Consulting"));
+  wrap.appendChild(cont);
+  return wrap;
+}
+
+// ── FORM ─────────────────────────────────────────────────────────────────────
+function renderForm(){
+  const wrap=h("div",{style:{fontFamily:"inherit",background:"#F2F6F9",minHeight:"100vh"}});
+  wrap.appendChild(renderHeader("PPWR ASSESSMENT"));
+  const cont=$div("container-sm");
+  const card=h("div",{className:"card",style:{padding:"36px"}});
+  card.appendChild(h("h2",{style:{color:C.navy,fontSize:"22px",fontWeight:"800",margin:"0 0 6px"}},"Chi sei?"));
+  card.appendChild(h("p",{style:{color:C.slate,fontSize:"13px",margin:"0 0 28px"}},"Inserisci i tuoi dati per accedere all'assessment e ricevere il report."));
+
+  const errors={};
+
+  const grid=$div("form-grid-2");
+  ["name","company"].forEach(key=>{
+    const g=$div("form-group",{marginBottom:"0"});
+    g.appendChild(h("label",{className:"form-label"},key==="name"?"Nome e Cognome *":"Azienda *"));
+    const inp=h("input",{type:"text",className:"form-input",placeholder:key==="name"?"Mario Rossi":"Es. Caffè Esempio S.r.l.",id:"f_"+key,value:state.form[key]});
+    inp.addEventListener("input",e=>state.form[key]=e.target.value);
+    g.appendChild(inp);
+    const err=h("span",{className:"form-error",id:"err_"+key,style:{display:"none"}});
+    g.appendChild(err);
+    grid.appendChild(g);
+  });
+  card.appendChild(grid);
+
+  // Role select
+  const rg=$div("form-group");
+  rg.appendChild(h("label",{className:"form-label"},"Ruolo / Funzione *"));
+  const sel=h("select",{className:"form-input",id:"f_role"});
+  sel.appendChild(h("option",{value:""},"— Seleziona —"));
+  ["CEO / Direzione Generale","Responsabile Acquisti / Supply Chain","Responsabile Legale / Compliance","Responsabile Qualità / Sostenibilità","Responsabile ESG / CSR","Responsabile Packaging","Consulente Esterno","Altro"].forEach(r=>{
+    const o=h("option",{value:r},r);
+    if(state.form.role===r)o.selected=true;
+    sel.appendChild(o);
+  });
+  sel.addEventListener("change",e=>state.form.role=e.target.value);
+  rg.appendChild(sel);
+  rg.appendChild(h("span",{className:"form-error",id:"err_role",style:{display:"none"}}));
+  card.appendChild(rg);
+
+  const grid2=$div("form-grid-2");
+  [{key:"email",label:"Email *",type:"email",ph:"mario@azienda.it"},{key:"phone",label:"Cellulare *",type:"tel",ph:"+39 333 000 0000"}].forEach(({key,label,type,ph})=>{
+    const g=$div("form-group",{marginBottom:"0"});
+    g.appendChild(h("label",{className:"form-label"},label));
+    const inp=h("input",{type,className:"form-input",placeholder:ph,id:"f_"+key,value:state.form[key]});
+    inp.addEventListener("input",e=>state.form[key]=e.target.value);
+    g.appendChild(inp);
+    g.appendChild(h("span",{className:"form-error",id:"err_"+key,style:{display:"none"}}));
+    grid2.appendChild(g);
+  });
+  card.appendChild(grid2);
+
+  const nav=$div("btn-nav",{marginTop:"28px"});
+  const back=h("button",{className:"btn",style:{background:"#E8EEF3",color:C.slate}},"← Indietro");
+  back.addEventListener("click",()=>setState({step:"welcome"}));
+  const go=h("button",{className:"btn",style:{background:C.teal3,color:"#fff",flex:"2"}},"Avvia Assessment →");
+  go.addEventListener("click",()=>{
+    const f=state.form;
+    let ok=true;
+    [["name","Campo obbligatorio"],["company","Campo obbligatorio"],["role","Campo obbligatorio"],["email","Email non valida"],["phone","Campo obbligatorio"]].forEach(([k,msg])=>{
+      const el=document.getElementById("f_"+k);
+      const err=document.getElementById("err_"+k);
+      const val=k==="email"?(/\S+@\S+\.\S+/.test(f[k])):f[k].trim();
+      if(!val){el.classList.add("err");err.textContent=msg;err.style.display="block";ok=false;}
+      else{el.classList.remove("err");err.style.display="none";}
+    });
+    if(ok)setState({step:"assessment",secIdx:0});
+  });
+  nav.appendChild(back);nav.appendChild(go);
+  card.appendChild(nav);
+  cont.appendChild(card);
+  wrap.appendChild(cont);
+  return wrap;
+}
+
+// ── ASSESSMENT ───────────────────────────────────────────────────────────────
+function renderAssessment(){
+  const wrap=h("div",{style:{fontFamily:"inherit",background:"#F2F6F9",minHeight:"100vh"}});
+  wrap.appendChild(renderHeader("PPWR",state.form.company));
+
+  // progress
+  const totalQ=SECTIONS.reduce((t,s)=>t+s.questions.length,0);
+  const totalAns=Object.keys(state.answers).length;
+  const pct=Math.round(totalAns/totalQ*100);
+  const pb=$div("prog-bar-wrap");
+  const pl=$div("prog-labels");
+  pl.appendChild(h("span",null,"Completamento assessment"));
+  pl.appendChild(h("span",null,`${totalAns} / ${totalQ} domande`));
+  pb.appendChild(pl);
+  const pt=$div("prog-track");
+  const pf=$div("prog-fill",{width:pct+"%"});
+  pt.appendChild(pf);pb.appendChild(pt);
+  wrap.appendChild(pb);
+
+  const cont=$div("container");
+  const sec=SECTIONS[state.secIdx];
+
+  // section header card
+  const shCard=$div("card",{marginBottom:"20px",overflow:"hidden"});
+  const shHdr=$div("sec-hdr",{background:sec.color});
+  const shl=$div("sec-hdr-left");
+  shl.appendChild($div("sec-hdr-icon",null,sec.icon));
+  const shd=h("div");
+  shd.appendChild($div("sec-hdr-title",null,sec.title));
+  shd.appendChild($div("sec-hdr-ref",null,sec.ref));
+  shl.appendChild(shd);
+  shHdr.appendChild(shl);
+  shHdr.appendChild(h("div",{style:{color:"rgba(255,255,255,.8)",fontSize:"12px"}},`Sezione ${state.secIdx+1} di ${SECTIONS.length}`));
+  shCard.appendChild(shHdr);
+
+  // tabs
+  const tabs=$div("tabs");
+  SECTIONS.forEach((s,i)=>{
+    const done=s.questions.every(q=>state.answers[q.id]!==undefined);
+    const isActive=i===state.secIdx;
+    const tb=h("button",{className:"tab-btn",style:{
+      background:isActive?"#fff":"#F8FAFB",
+      borderBottom:isActive?`3px solid ${s.color}`:"3px solid transparent",
+      color:isActive?s.color:"#8A9BB0",fontWeight:isActive?"700":"400"
+    }});
+    tb.appendChild(h("span",null,s.icon));
+    const dot=h("span",{className:"tab-dot"+(done?" show":"")});
+    tb.appendChild(dot);
+    tb.addEventListener("click",()=>setState({secIdx:i}));
+    tabs.appendChild(tb);
+  });
+  shCard.appendChild(tabs);
+  cont.appendChild(shCard);
+
+  // questions
+  sec.questions.forEach((q,qi)=>{
+    const qc=$div("q-card");
+    const qh=$div("q-header");
+    const qn=h("span",{className:"q-num",style:{background:sec.color+"20",color:sec.color}},(qi+1).toString());
+    const qt=h("div",{className:"q-text"});
+    const qtitle=h("p",{className:"q-title"});
+    if(q.risk){qtitle.appendChild(h("span",{className:"badge-critico"},"CRITICO"));}
+    qtitle.appendChild(document.createTextNode(q.text));
+    qt.appendChild(qtitle);
+    qt.appendChild(h("span",{className:"q-ref"},q.ref));
+    qh.appendChild(qn);qh.appendChild(qt);qc.appendChild(qh);
+
+    const opts=$div("options");
+    q.options.forEach(opt=>{
+      const sel=state.answers[q.id]===opt.s;
+      const optColor=sel?(opt.s===3?C.green:opt.s===1?C.amber:C.red):"#F8FAFB";
+      const lbl=h("label",{className:"opt-label",style:{
+        border:`1.5px solid ${sel?optColor:"#E0E8EE"}`,
+        background:sel?optColor+"15":"#F8FAFB"
+      }});
+      const inp=h("input",{type:"radio",className:"opt-radio",name:"q_"+q.id});
+      if(sel)inp.checked=true;
+      inp.addEventListener("change",()=>{
+        state.answers={...state.answers,[q.id]:opt.s};
+        render();
+      });
+      const dot=h("span",{className:"opt-dot",style:{borderColor:sel?optColor:"#C0CDD8",background:sel?optColor:"transparent"}});
+      if(sel){const inner=h("span",{className:"opt-dot-inner",style:{display:"block"}});dot.appendChild(inner);}
+      const txt=h("span",{className:"opt-text",style:{color:sel?"#1A2535":C.slate,fontWeight:sel?"600":"400"}},opt.l);
+      const score=h("span",{className:"opt-score",style:{color:sel?optColor:"#C0CDD8"}},opt.s+" pt");
+      lbl.appendChild(inp);lbl.appendChild(dot);lbl.appendChild(txt);lbl.appendChild(score);
+      opts.appendChild(lbl);
+    });
+    qc.appendChild(opts);
+    cont.appendChild(qc);
+  });
+
+  // navigation
+  const curDone=sec.questions.every(q=>state.answers[q.id]!==undefined);
+  const allDone=totalAns===totalQ;
+  const nav=$div("btn-nav");
+  if(state.secIdx>0){
+    const prev=h("button",{className:"btn",style:{background:"#E8EEF3",color:C.slate}},"← Precedente");
+    prev.addEventListener("click",()=>setState({secIdx:state.secIdx-1}));
+    nav.appendChild(prev);
+  }
+  nav.appendChild(h("div",{style:{flex:"1"}}));
+  if(state.secIdx<SECTIONS.length-1){
+    const next=h("button",{className:"btn",style:{background:curDone?C.teal3:"#B0C0CC",color:"#fff"},disabled:!curDone},"Prossima sezione →");
+    if(curDone)next.addEventListener("click",()=>setState({secIdx:state.secIdx+1}));
+    nav.appendChild(next);
+  } else {
+    const fin=h("button",{className:"btn",style:{background:allDone?C.green:"#B0C0CC",color:"#fff",fontWeight:"800"},disabled:!allDone},allDone?"✓ Visualizza Risultati":`Completa tutte le domande (${totalAns}/${totalQ})`);
+    if(allDone)fin.addEventListener("click",()=>{setState({step:"results"});sendLead();});
+    nav.appendChild(fin);
+  }
+  cont.appendChild(nav);
+  wrap.appendChild(cont);
+  return wrap;
+}
+
+// ── RESULTS ──────────────────────────────────────────────────────────────────
+function renderResults(){
+  const wrap=h("div",{style:{fontFamily:"inherit",background:"#F2F6F9",minHeight:"100vh"}});
+  wrap.appendChild(renderHeader("REPORT PPWR"));
+  const cont=$div("container-lg");
+  const g=globalScore(state.answers);
+  const gR=riskLevel(g.pct);
+  const gaps=criticalGaps(state.answers);
+
+  // Hero
+  const heroCard=$div("card",{marginBottom:"20px",overflow:"hidden"});
+  const hero=$div("hero-score",{background:`linear-gradient(135deg,${C.navy},${C.teal4})`});
+  const hpct=$div("hero-pct");
+  hpct.appendChild($div("hero-pct-num",null,g.pct+"%"));
+  hpct.appendChild($div("hero-pct-sub",null,`${g.score} / ${MAX_SCORE} pt`));
+  const hinfo=$div("hero-info");
+  hinfo.appendChild($div("hero-company",null,`${state.form.company} — PPWR Assessment`));
+  hinfo.appendChild(h("span",{className:"risk-badge",style:{background:gR.color}},gR.label.toUpperCase()));
+  hinfo.appendChild(h("br"));
+  const desc=g.pct>=75?"Il livello di conformità PPWR è buono. Consolidare le aree ancora parziali prima delle scadenze operative.":g.pct>=45?"Sono presenti aree di rischio rilevanti. È necessario un piano strutturato di adeguamento al PPWR.":"Il gap di conformità PPWR è significativo. È richiesta un'azione strutturata su tutte le aree critiche con priorità.";
+  hinfo.appendChild($div("hero-desc",{marginTop:"8px"},desc));
+  hero.appendChild(hpct);hero.appendChild(hinfo);
+  heroCard.appendChild(hero);
+  if(gaps.length){
+    const ga=$div("gaps-alert");
+    ga.appendChild($div("gaps-alert-icon",null,"⚠"));
+    ga.appendChild($div("gaps-alert-text",null,`${gaps.length} gap critico${gaps.length>1?"i":""} rilevato${gaps.length>1?"i":""} — azioni prioritarie raccomandate`));
+    heroCard.appendChild(ga);
+  }
+  cont.appendChild(heroCard);
+
+  // Section scores grid
+  const sg=$div("sec-grid");
+  SECTIONS.forEach(s=>{
+    const r=secScore(s.id,state.answers);const rl=riskLevel(r.pct);
+    const c=$div("sec-result-card");
+    const top=$div("sec-result-top");
+    top.appendChild($div("sec-result-icon",null,s.icon));
+    const info=h("div");
+    info.appendChild($div("sec-result-name",null,s.title));
+    info.appendChild($div("sec-result-ref",null,s.ref));
+    top.appendChild(info);
+    top.appendChild(h("div",{className:"sec-result-pct",style:{color:rl.color}},r.pct+"%"));
+    const bt=$div("bar-track");
+    bt.appendChild(h("div",{className:"bar-fill",style:{width:r.pct+"%",background:rl.color}}));
+    const bot=$div("sec-result-bottom");
+    bot.appendChild(h("span",{style:{color:rl.color,fontWeight:"600"}},rl.label));
+    bot.appendChild(h("span",{style:{color:"#8A9BB0"}},`${r.score}/${r.max} pt`));
+    c.appendChild(top);c.appendChild(bt);c.appendChild(bot);
+    sg.appendChild(c);
+  });
+  cont.appendChild(sg);
+
+  // Critical gaps
+  if(gaps.length){
+    const gc=$div("gaps-card");
+    gc.appendChild(h("h3",{className:"gaps-title"},"⚠ Gap Critici da Presidiare"));
+    gaps.forEach((gap,i)=>{
+      const gi=$div("gap-item");
+      gi.appendChild($div("gap-num",null,(i+1)+"."));
+      const gd=h("div");
+      gd.appendChild(h("span",{className:"gap-section-badge"},gap.section+" • "+gap.ref));
+      gd.appendChild(h("br"));
+      gd.appendChild(h("p",{className:"gap-text"},gap.text));
+      gi.appendChild(gd);
+      gc.appendChild(gi);
+    });
+    cont.appendChild(gc);
+  }
+
+  // Deadlines
+  const dc=$div("deadlines-card");
+  dc.appendChild(h("h3",{className:"deadlines-title"},"📅 Scadenze Chiave PPWR"));
+  const dg=$div("deadlines-grid");
+  [
+    {d:"12 ago 2026",t:"Limitazione PFAS — imballaggi a contatto con alimenti (Art. 5)",c:C.red},
+    {d:"12 feb 2027",t:"Obbligo ricarica HoReCa — contenitori cibo e bevande (Art. 28)",c:C.teal3},
+    {d:"12 ago 2028",t:"Etichettatura armonizzata obbligatoria con dettagli materiale (Art. 12)",c:C.teal3},
+    {d:"1 gen 2030",t:"Restrizioni monouso + PCR 30% + spazio vuoto ≤50% + riciclabilità A/B/C",c:C.red},
+  ].forEach(item=>{
+    const di=h("div",{className:"deadline-item",style:{background:item.c+"10",border:`1px solid ${item.c}30`}});
+    di.appendChild(h("span",{className:"deadline-date",style:{background:item.c}},item.d));
+    di.appendChild($div("deadline-text",null,item.t));
+    dg.appendChild(di);
+  });
+  dc.appendChild(dg);cont.appendChild(dc);
+
+  // CTA
+  const cta=$div("cta-card",{background:`linear-gradient(135deg,${C.navy},${C.teal4})`});
+  cta.appendChild($div("cta-title",null,"Vuoi un supporto strutturato per la conformità PPWR?"));
+  cta.appendChild(h("p",{className:"cta-desc"},"ISA Digital Consulting offre percorsi di advisory integrati: dalla gap analysis all'implementazione digitale, dalla Dichiarazione di Conformità UE alla gestione EPR e reporting di sostenibilità."));
+  const ctaB=$div("cta-btns");
+  const pdfBtn=h("button",{className:"btn",style:{background:state.jsPdfReady?"#fff":"#B0C4CE",color:state.jsPdfReady?C.navy:"#8A9BB0"}},"↓ Scarica Report PDF");
+  if(state.jsPdfReady)pdfBtn.addEventListener("click",generatePDF);
+  const newBtn=h("button",{className:"btn",style:{background:C.teal3,color:"#fff"}},"↺ Nuovo Assessment");
+  newBtn.addEventListener("click",()=>setState({step:"welcome",secIdx:0,answers:{},emailSent:false}));
+  ctaB.appendChild(pdfBtn);ctaB.appendChild(newBtn);
+  cta.appendChild(ctaB);
+  cont.appendChild(cta);
+  wrap.appendChild(cont);
+  return wrap;
+}
+
+// ── HEADER ────────────────────────────────────────────────────────────────────
+function renderHeader(tag,company){
+  const hdr=$div("hdr");
+  const logo=h("img",{src:LOGO,alt:"ISA Digital Consulting",style:{height:"32px",display:"block"}});
+  hdr.appendChild(logo);
+  const right=h("div",{style:{display:"flex",alignItems:"center",gap:"12px"}});
+  if(company)right.appendChild(h("span",{style:{color:"#8AABBE",fontSize:"12px"}},company));
+  right.appendChild(h("span",{className:"tag"},tag));
+  hdr.appendChild(right);
+  return hdr;
+}
+
+// ── BOOT ─────────────────────────────────────────────────────────────────────
+if(!window.jspdf){
+  const s=document.createElement("script");
+  s.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+  s.onload=()=>{state.jsPdfReady=true;render();};
+  document.head.appendChild(s);
+}
+render();
+</script>
+</body>
+</html>
